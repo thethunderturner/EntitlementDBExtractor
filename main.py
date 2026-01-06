@@ -64,8 +64,10 @@ def parse_entitlements_db(db_file):
 
                     entry = {
                         "name": game_meta.get('name', 'Unknown'),
+                        "icon": game_meta.get('icon_url','Not Found'),
                         "id": data.get('id'),
                         "active": data.get('active_flag', False),
+                        "hasRif": data.get('hasRif', None),
                         "size": round(pkg_size / (1024 ** 3), 2) if pkg_size else 0,
                         "pkg_url": pkg_url,
                         "license_expired": True if data.get('inactive_date') else False,
