@@ -40,13 +40,7 @@ def parse_entitlements_db(db_file):
 
                 for row in rows:
                     json_content = row[0]
-                    if not json_content:
-                        continue
-
-                    try:
-                        data = json.loads(json_content)
-                    except json.JSONDecodeError:
-                        continue
+                    data = json.loads(json_content)
 
                     # Extract metadata
                     game_meta = data.get('game_meta', {})
