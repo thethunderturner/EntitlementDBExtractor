@@ -9,30 +9,11 @@ def parse_entitlements_db(db_file):
     if not os.path.exists(output_dir):
         os.makedirs(output_dir)
 
-    games_list = {
-        "active": [],
-        "inactive": []
-    }
-
-    themes_list = {
-        "active": [],
-        "inactive": []
-    }
-
-    additional_content = {
-        "active": [],
-        "inactive": []
-    }
-
-    additional_license = {
-        "active": [],
-        "inactive": []
-    }
-
-    broken = {
-        "active": [],
-        "inactive": []
-    }
+    games_list = {}
+    themes_list = {}
+    additional_content = {}
+    additional_license = {}
+    broken = {}
 
     try:
         conn = sqlite3.connect(db_file)
@@ -50,6 +31,9 @@ def parse_entitlements_db(db_file):
 
         for table in tables:
             try:
+                number = int(table.split("_")[1])
+                user_id = f"{number:x}"
+
                 cursor.execute(f"SELECT JSON FROM {table}")
                 rows = cursor.fetchall()
 
@@ -85,37 +69,47 @@ def parse_entitlements_db(db_file):
 
                     # Themes
                     if sub_type == 'MISC_THEME':
+                        if user_id not in themes_list:
+                            themes_list[user_id] = {"active": [], "inactive": []}
                         if entry["active"]:
-                            themes_list["active"].append(entry)
+                            themes_list[user_id]["active"].append(entry)
                         else:
-                            themes_list["inactive"].append(entry)
+                            themes_list[user_id]["inactive"].append(entry)
 
                     # Games (PS4GD = Game Digital)
                     elif pkg_type == 'PS4GD':
+                        if user_id not in games_list:
+                            games_list[user_id] = {"active": [], "inactive": []}
                         if entry["active"]:
-                            games_list["active"].append(entry)
+                            games_list[user_id]["active"].append(entry)
                         else:
-                            games_list["inactive"].append(entry)
+                            games_list[user_id]["inactive"].append(entry)
 
                     # Additional Content
                     elif pkg_type == 'PS4AC':
+                        if user_id not in additional_content:
+                            additional_content[user_id] = {"active": [], "inactive": []}
                         if entry["active"]:
-                            additional_content["active"].append(entry)
+                            additional_content[user_id]["active"].append(entry)
                         else:
-                            additional_content["inactive"].append(entry)
+                            additional_content[user_id]["inactive"].append(entry)
 
                     # Additional License
                     elif pkg_type == 'PS4AL':
+                        if user_id not in additional_license:
+                            additional_license[user_id] = {"active": [], "inactive": []}
                         if entry["active"]:
-                            additional_license["active"].append(entry)
+                            additional_license[user_id]["active"].append(entry)
                         else:
-                            additional_license["inactive"].append(entry)
+                            additional_license[user_id]["inactive"].append(entry)
 
                     else:
+                        if user_id not in broken:
+                            broken[user_id] = {"active": [], "inactive": []}
                         if entry["active"]:
-                            broken["active"].append(entry)
+                            broken[user_id]["active"].append(entry)
                         else:
-                            broken["inactive"].append(entry)
+                            broken[user_id]["inactive"].append(entry)
                     total_rows += 1
             except sqlite3.OperationalError as e:
                 print(f"Skipping table {table}: {e}")
@@ -135,19 +129,38 @@ def parse_entitlements_db(db_file):
     write_json(os.path.join(output_dir, 'additional_license.json'), additional_license)
     write_json(os.path.join(output_dir, 'broken.json'), broken)
 
-    total_games = len(games_list["active"]) + len(games_list["inactive"])
-    total_themes = len(themes_list["active"]) + len(themes_list["inactive"])
-    total_additional_content = len(additional_content["active"]) + len(additional_content["inactive"])
-    total_additional_license = len(additional_license["active"]) + len(additional_license["inactive"])
-    total_broken = len(broken["active"]) + len(broken["inactive"])
+    total_games = {
+        "total_users": len(games_list),
+        "total_active": sum(len(user["active"]) for user in games_list.values()),
+        "total_inactive": sum(len(user["inactive"]) for user in games_list.values())
+    }
+    total_themes = {
+        "total_users": len(themes_list),
+        "total_active": sum(len(theme["active"]) for theme in themes_list.values()),
+        "total_inactive": sum(len(theme["inactive"]) for theme in themes_list.values())
+    }
+    total_additional_content = {
+        "total_users": len(additional_content),
+        "total_active": sum(len(ac["active"]) for ac in additional_content.values()),
+        "total_inactive": sum(len(ac["inactive"]) for ac in additional_content.values())
+    }
+    total_additional_license = {
+        "total_users": len(additional_license),
+        "total_active": sum(len(al["active"]) for al in additional_license.values()),
+        "total_inactive": sum(len(al["inactive"]) for al in additional_license.values())
+    }
+    total_broken = {
+        "total_users": len(broken),
+        "total_active": sum(len(b["active"]) for b in broken.values()),
+        "total_inactive": sum(len(b["inactive"]) for b in broken.values())
+    }
 
-    print(f"Done! Processed {total_rows} entries.")
-    print(f"Found {total_games} games ({len(games_list['active'])} active)")
-    print(f"Found {total_themes} themes ({len(themes_list['active'])} active)")
-    print(f"Found {total_additional_content} additional content")
-    print(f"Found {total_additional_license} additional licenses")
-    print(f"Found {total_broken} broken entries")
-
+    print(f"Done! Processed {total_rows} entries")
+    print(f"Found {total_games['total_users']} user(s) with games titles, and in total {total_games['total_active']} active and {total_games['total_inactive']} inactive games.")
+    print(f"Found {total_themes['total_users']} user(s) with theme titles, and in total {total_themes['total_active']} active and {total_themes['total_inactive']} inactive games.")
+    print(f"Found {total_additional_content['total_users']} user(s) with Additional Content titles, and in total {total_additional_content['total_active']} active and {total_additional_content['total_inactive']} inactive games.")
+    print(f"Found {total_additional_license['total_users']} user(s) with users with games titles, and in total {total_additional_license['total_active']} active and {total_additional_license['total_inactive']} inactive games.")
+    print(f"Found {total_broken['total_users']} user(s) with broken titles, and in total {total_broken['total_active']} active and {total_broken['total_inactive']} inactive games.")
     print(f"Files saved in {output_dir}/")
 
 def write_json(path, data):
