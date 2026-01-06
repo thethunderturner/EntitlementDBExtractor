@@ -24,6 +24,16 @@ def parse_entitlements_db(db_file):
         "inactive": []
     }
 
+    additional_license = {
+        "active": [],
+        "inactive": []
+    }
+
+    broken = {
+        "active": [],
+        "inactive": []
+    }
+
     try:
         conn = sqlite3.connect(db_file)
         cursor = conn.cursor()
@@ -87,12 +97,25 @@ def parse_entitlements_db(db_file):
                         else:
                             games_list["inactive"].append(entry)
 
+                    # Additional Content
                     elif pkg_type == 'PS4AC':
                         if entry["active"]:
                             additional_content["active"].append(entry)
                         else:
                             additional_content["inactive"].append(entry)
 
+                    # Additional License
+                    elif pkg_type == 'PS4AL':
+                        if entry["active"]:
+                            additional_license["active"].append(entry)
+                        else:
+                            additional_license["inactive"].append(entry)
+
+                    else:
+                        if entry["active"]:
+                            broken["active"].append(entry)
+                        else:
+                            broken["inactive"].append(entry)
                     total_rows += 1
             except sqlite3.OperationalError as e:
                 print(f"Skipping table {table}: {e}")
@@ -109,15 +132,22 @@ def parse_entitlements_db(db_file):
     write_json(os.path.join(output_dir, 'games.json'), games_list)
     write_json(os.path.join(output_dir, 'themes.json'), themes_list)
     write_json(os.path.join(output_dir, 'additional_content.json'), additional_content)
+    write_json(os.path.join(output_dir, 'additional_license.json'), additional_license)
+    write_json(os.path.join(output_dir, 'broken.json'), broken)
 
     total_games = len(games_list["active"]) + len(games_list["inactive"])
     total_themes = len(themes_list["active"]) + len(themes_list["inactive"])
     total_additional_content = len(additional_content["active"]) + len(additional_content["inactive"])
+    total_additional_license = len(additional_license["active"]) + len(additional_license["inactive"])
+    total_broken = len(broken["active"]) + len(broken["inactive"])
 
     print(f"Done! Processed {total_rows} entries.")
     print(f"Found {total_games} games ({len(games_list['active'])} active)")
     print(f"Found {total_themes} themes ({len(themes_list['active'])} active)")
     print(f"Found {total_additional_content} additional content")
+    print(f"Found {total_additional_license} additional licenses")
+    print(f"Found {total_broken} broken entries")
+
     print(f"Files saved in {output_dir}/")
 
 def write_json(path, data):
