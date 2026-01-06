@@ -156,11 +156,11 @@ def parse_entitlements_db(db_file):
     }
 
     print(f"Done! Processed {total_rows} entries")
-    print(f"Found {total_games['total_users']} user(s) with games titles, and in total {total_games['total_active']} active and {total_games['total_inactive']} inactive games.")
-    print(f"Found {total_themes['total_users']} user(s) with theme titles, and in total {total_themes['total_active']} active and {total_themes['total_inactive']} inactive games.")
+    print(f"Found {total_games['total_users']} user(s) with Game titles, and in total {total_games['total_active']} active and {total_games['total_inactive']} inactive games.")
+    print(f"Found {total_themes['total_users']} user(s) with Theme titles, and in total {total_themes['total_active']} active and {total_themes['total_inactive']} inactive games.")
     print(f"Found {total_additional_content['total_users']} user(s) with Additional Content titles, and in total {total_additional_content['total_active']} active and {total_additional_content['total_inactive']} inactive games.")
-    print(f"Found {total_additional_license['total_users']} user(s) with users with games titles, and in total {total_additional_license['total_active']} active and {total_additional_license['total_inactive']} inactive games.")
-    print(f"Found {total_broken['total_users']} user(s) with broken titles, and in total {total_broken['total_active']} active and {total_broken['total_inactive']} inactive games.")
+    print(f"Found {total_additional_license['total_users']} user(s) with Additional License titles, and in total {total_additional_license['total_active']} active and {total_additional_license['total_inactive']} inactive games.")
+    print(f"Found {total_broken['total_users']} user(s) with Broken titles, and in total {total_broken['total_active']} active and {total_broken['total_inactive']} inactive games.")
     print(f"Files saved in {output_dir}/")
 
 def write_json(path, data):
