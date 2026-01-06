@@ -1,0 +1,1 @@
+EntitlementDBExtractor is a program that extracts licenses and entitlements for your digital games, DLC, themes, and other content. This will allow you to potentially reinstall deleted games from your Jailbroken PS4.
