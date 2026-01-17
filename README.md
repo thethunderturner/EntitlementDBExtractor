@@ -12,7 +12,7 @@ The tool will give you the links to Sony's API, so you can re-download your titl
 
 Run with the following command
 ```bash
-python <path-to-db>
+python main.py <path-to-db>
 ```
 
 The script will create five JSON files in output/; `games.json`, `themes.json`, `additional_content.json`, `additional_license.json` and `broken.json`.
