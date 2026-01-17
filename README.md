@@ -1,6 +1,7 @@
 # EntitlementDBExtractor
 
-EntitlementDBExtractor is a program that allows you to extract licenses and entitlements for your digital games, DLC, themes, and other content from your `entitlement.db` file from your PlayStation 4. This allows you to re-download PSN titles you've deleted from your system.
+## Extract PKG links from entitlement.db file
+EntitlementDBExtractor is a program that allows you to extract **retail** PKG links for your digital games, DLC, themes, and other content from your `entitlement.db` file from your PlayStation 4. This allows you to re-download PSN titles you've deleted from your system.
 > [!IMPORTANT]
 > In order for this process to work, your account should've been set as primary at the time of downloading the game in the past, and your console must not be formatted after downloading the game; otherwise this process will not work, because you will be missing the license key!
 
